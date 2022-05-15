@@ -12,22 +12,10 @@ import java.util.concurrent.TimeUnit;
 @RestController
 public class OrderController {
     private final Orders orders;
-    BaristaServer barista = new BaristaServer("localhost", 3000);
-    NioClient baristaClient = new NioClient("localhost", 3000);
 
     @Autowired
     public OrderController(Orders orders) {
         this.orders = orders;
-        barista.start();
-
-        try {
-            TimeUnit.SECONDS.sleep(2);
-            baristaClient.startClient();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-        e.printStackTrace();
-    }
     }
 
     // Создаёт заказ
@@ -55,11 +43,6 @@ public class OrderController {
     @PutMapping(value = "/orders/{id}")
     public ResponseEntity<Integer> putItem(@PathVariable(name = "id") Integer id, @RequestBody OrderItem orderItem) {
         if (orders.orderExists(id)) {
-            try {
-                baristaClient.sendList(orderItem.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             return new ResponseEntity<>(orders.putItem(id, orderItem), HttpStatus.OK);
         } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -97,12 +80,12 @@ public class OrderController {
     }
 
     // Отправляет заказ на выдачу
-    @PostMapping(value = "/product/{id}")
-    public ResponseEntity<?> distributeOrder(@PathVariable(name = "id") Integer id) {
-        if (orders.productExists(id)) {
-            return new ResponseEntity<>(orders.distributeOrder(id), HttpStatus.OK);
-        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+//    @PostMapping(value = "/product/{id}")
+//    public ResponseEntity<?> distributeOrder(@PathVariable(name = "id") Integer id) {
+//        if (orders.productExists(id)) {
+//            return new ResponseEntity<>(orders.distributeOrder(id), HttpStatus.OK);
+//        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 
     // Возвращает список заказов на выдаче
     @GetMapping(value = "/distrib")
@@ -111,11 +94,11 @@ public class OrderController {
     }
 
     // Закрывает заказ при выдаче
-    @PostMapping(value = "/distrib/{ordId}")
-    public ResponseEntity<?> closeOrder(@PathVariable(name = "ordId") Integer orderId) {
-        if (orders.distribExists(orderId)) {
-            orders.closeOrder(orderId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+//    @PostMapping(value = "/distrib/{ordId}")
+//    public ResponseEntity<?> closeOrder(@PathVariable(name = "ordId") Integer orderId) {
+//        if (orders.distribExists(orderId)) {
+//            orders.closeOrder(orderId);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 }

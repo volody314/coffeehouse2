@@ -1,6 +1,9 @@
 package com.volody314.coffeehouse2;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -17,11 +20,11 @@ import java.util.*;
 public class NioServer {
 
     private Selector selector;
-    private InetSocketAddress listenAddress;
-    String ADDRESS;
-    int PORT;
+    private final InetSocketAddress listenAddress;
+    private String ADDRESS;
+    private int PORT;
     private ServerSocketChannel serverChannel;
-    private Map<SocketChannel, List> dataMapper = new HashMap<SocketChannel,List>();;
+    private final Map<SocketChannel, List> dataMapper = new HashMap<SocketChannel,List>();
 
     public NioServer(String addr, int port) {
         listenAddress = new InetSocketAddress(addr, port);
@@ -77,7 +80,7 @@ public class NioServer {
     //read from the socket channel
     private void read(SelectionKey key) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(8192);
         int numRead = -1;
         numRead = channel.read(buffer);
 
@@ -91,9 +94,31 @@ public class NioServer {
             return;
         }
 
+        Order order = new Order(-1);
         byte[] data = new byte[numRead];
         System.arraycopy(buffer.array(), 0, data, 0, numRead);
-        String recvData = new String(data);
-        System.out.println("Recieved from "+channel.socket().getRemoteSocketAddress()+" : " + recvData);
+
+        // Десериализация
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        ObjectInput in = null;
+        try {
+            in = new ObjectInputStream(bis);
+            order = (Order) in.readObject(); // **************************************
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+
+        //String recvData = new String(data);
+        System.out.println("Recieved from "+channel.socket().getRemoteSocketAddress()+" order " + order.getId());
     }
 }

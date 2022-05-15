@@ -51,7 +51,7 @@ public interface Orders {
      * @param orderId Номер заказа
      * @return Успешность выполнения
      */
-    boolean distributeOrder(Integer orderId);
+    //boolean distributeOrder(Integer orderId);
 
     /**
      * Выводит перечень заказов на выдаче
@@ -77,12 +77,12 @@ public interface Orders {
      * @param orderId Номер заказа
      * @return Есть?
      */
-    boolean productExists(Integer orderId);
+    //boolean productExists(Integer orderId);
 
     /**
      * Проверяет наличие заказа в выдаче
      * @param orderId Номер заказа
      * @return Есть?
      */
-    boolean distribExists(Integer orderId);
+    //boolean distribExists(Integer orderId);
 }

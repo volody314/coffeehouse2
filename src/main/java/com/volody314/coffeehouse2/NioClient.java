@@ -1,6 +1,8 @@
 package com.volody314.coffeehouse2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -13,9 +15,9 @@ import static java.nio.ByteBuffer.allocate;
  * Класс клиентской части канала
  */
 public class NioClient {
-    private int PORT;
-    private String ADDRESS;
-    private ByteBuffer buffer = allocate(1024);
+    private final int PORT;
+    private final String ADDRESS;
+    private final ByteBuffer buffer = allocate(8192);
     SocketChannel channel;
     Selector selector;
 
@@ -45,11 +47,26 @@ public class NioClient {
         System.out.println("NIO Client " + ADDRESS + ":" + PORT + " closed");
     }
 
-    public void sendList(String message) throws IOException {
-        byte [] bmessage = message.getBytes();
-        ByteBuffer buffer = ByteBuffer.wrap(bmessage);
-        channel.write(buffer);
-        System.out.println("Sent " + message);
+    /**
+     * Сериализует и отправляет серверу заказ
+     * @param order Заказ
+     * @throws IOException
+     */
+    public void sendList(Order order) {
+        //byte [] bmessage = message.getBytes();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(order);
+            out.flush();
+            byte[] byteObj = bos.toByteArray();
+            ByteBuffer buffer = ByteBuffer.wrap(byteObj);
+            channel.write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Sent");
         buffer.clear();
         //return true;
     }

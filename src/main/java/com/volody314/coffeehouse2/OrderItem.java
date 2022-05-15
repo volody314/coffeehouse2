@@ -1,9 +1,11 @@
 package com.volody314.coffeehouse2;
 
+import java.io.Serializable;
+
 /**
  * Позиция заказа
  */
-public class OrderItem {
+public class OrderItem implements Serializable {
     private Integer id;     // Номер позиции
     private String name;    // Название
     private Float prise;    // Цена

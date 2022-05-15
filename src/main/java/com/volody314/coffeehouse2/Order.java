@@ -1,11 +1,12 @@
 package com.volody314.coffeehouse2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Заказ
  */
-public class Order {
+public class Order implements Serializable {
     private final Integer id; // Идентификатор заказа
     //private Float overralSum = 0.0;  // Сумма чека
     private Integer posCounter = 0; // Счётчик позиций
@@ -40,6 +41,11 @@ public class Order {
         return posCounter++;
     }
 
+    /**
+     * Удаляет позицию из заказа по номеру
+     * @param toDel Номер позиции для удаления
+     * @return Список позиций в заказе после удаления
+     */
     public ArrayList<OrderItem> deleteItem(int toDel) {
         if (toDel < this.orderItems.size()) {
             //overralSum -= this.items.get(toDel).prise * this.items.get(toDel).count;
@@ -59,5 +65,6 @@ public class Order {
         for (int i = 0; i < orderItems.size(); ++i) {
             orderItems.get(i).setId(i);
         }
+        posCounter = orderItems.size();
     }
 }
