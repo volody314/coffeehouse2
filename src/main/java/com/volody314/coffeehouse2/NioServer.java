@@ -21,8 +21,8 @@ public class NioServer {
 
     private Selector selector;
     private final InetSocketAddress listenAddress;
-    private String ADDRESS;
-    private int PORT;
+    private final String ADDRESS;
+    private final int PORT;
     private ServerSocketChannel serverChannel;
     private final Map<SocketChannel, List> dataMapper = new HashMap<SocketChannel,List>();
 
@@ -104,9 +104,7 @@ public class NioServer {
         try {
             in = new ObjectInputStream(bis);
             order = (Order) in.readObject(); // **************************************
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {

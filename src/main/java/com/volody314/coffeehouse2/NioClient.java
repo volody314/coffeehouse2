@@ -50,12 +50,11 @@ public class NioClient {
     /**
      * Сериализует и отправляет серверу заказ
      * @param order Заказ
-     * @throws IOException
      */
     public void sendList(Order order) {
         //byte [] bmessage = message.getBytes();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = null;
+        ObjectOutputStream out;
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(order);
