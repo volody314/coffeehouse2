@@ -65,7 +65,7 @@ public class NioClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Sent");
+        //System.out.println("Sent");
         buffer.clear();
         //return true;
     }

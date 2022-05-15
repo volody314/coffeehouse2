@@ -32,7 +32,7 @@ public class NioServer {
         this.PORT = port;
     }
 
-    public void startServer() throws IOException {
+    public void startServer(Map<Integer, Order> container) throws IOException {
         System.out.println("Starting NIO server");
         this.selector = Selector.open();
         System.out.println("Selector opened");
@@ -57,7 +57,7 @@ public class NioServer {
                     this.accept(key);
                 }
                 else if (key.isReadable()) {
-                    this.read(key);
+                    this.read(key, container);
                 }
             }
         }
@@ -78,7 +78,7 @@ public class NioServer {
     }
 
     //read from the socket channel
-    private void read(SelectionKey key) throws IOException {
+    private void read(SelectionKey key, Map<Integer, Order> container) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         int numRead = -1;
@@ -91,7 +91,7 @@ public class NioServer {
             System.out.println("Connection closed by client: " + remoteAddr);
             channel.close();
             key.cancel();
-            return;
+            //return null;
         }
 
         Order order = new Order(-1);
@@ -103,7 +103,7 @@ public class NioServer {
         ObjectInput in = null;
         try {
             in = new ObjectInputStream(bis);
-            order = (Order) in.readObject(); // **************************************
+            order = (Order) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -116,7 +116,9 @@ public class NioServer {
             }
         }
 
-        //String recvData = new String(data);
         System.out.println("Recieved from "+channel.socket().getRemoteSocketAddress()+" order " + order.getId());
+        synchronized (order) {
+            container.put(order.getId(), order);
+        }
     }
 }

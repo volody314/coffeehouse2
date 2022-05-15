@@ -2,9 +2,7 @@ package com.volody314.coffeehouse2;
 
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +19,16 @@ public class OrdersImpl implements Orders {
     // Хранилище заказов
     private static final Map<Integer, Order> ORDER_REPOSITORY_MAP = new HashMap<>();
     //private static final Map<Integer, Order> PRODUCTION_REPOSITORY_MAP = new HashMap<>();
-    private static final Map<Integer, Order> DISTRIBUTION_REPOSITORY_MAP = new HashMap<>();
+    //private static final Map<Integer, Order> DISTRIBUTION_REPOSITORY_MAP = new HashMap<>();
 
     // "Внешние" объекты
-    BaristaServer barista = new BaristaServer("localhost", 3000);
-    NioClient baristaClient = new NioClient("localhost", 3000);
+
+    // Сервер производства (бариста)
+    BaristaServer baristaServer = new BaristaServer("localhost", 3001);
+    // Сервер заказов
+    OrdersServer ordersServer = new OrdersServer("localhost", 3000);
+    // Клиент для обращения к серверу заказов
+    NioClient ordersClient = new NioClient("localhost", 3000);
 
     // Генератор ID заказа
     private static final AtomicInteger ORDER_ID_HOLDER = new AtomicInteger();
@@ -33,15 +36,17 @@ public class OrdersImpl implements Orders {
 
     public OrdersImpl() {
         // Старт потока баристы
-        barista.start();
+        baristaServer.start();
+        ordersServer.start();
 
-        // Старт клиента баристы
+        // Старт клиента заказов
         try {
             TimeUnit.SECONDS.sleep(2);
-            baristaClient.startClient();
+            ordersClient.startClient();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        ordersServer.exchangeStart();
     }
 
     // Создание заказа
@@ -72,18 +77,14 @@ public class OrdersImpl implements Orders {
         return ORDER_REPOSITORY_MAP.get(orderId).deleteItem(itemId);
     }
 
-    // Отправка заказа в производство (баристе)
+    // Отправка заказа на сервер
     @Override
     public boolean produceOrder(Integer orderId) {
         Order order = ORDER_REPOSITORY_MAP.get(orderId);
         if (order != null) {
-            //PRODUCTION_REPOSITORY_MAP.put(orderId, order);
             ORDER_REPOSITORY_MAP.remove(orderId);
-
-            // Отправка баристе
-            System.out.println("Sending to barista order "+orderId);
-            baristaClient.sendList(order);
-
+            System.out.println("Sending to order "+orderId+" to server");
+            ordersClient.sendList(order);
             return true;
         } else return false;
     }
@@ -100,14 +101,14 @@ public class OrdersImpl implements Orders {
     @Override
     public List<Integer> showDistribution() {
         //return DISTRIBUTION_REPOSITORY_MAP.size();
-        return new ArrayList<>(DISTRIBUTION_REPOSITORY_MAP.keySet());
+        return new ArrayList<>(); //(DISTRIBUTION_REPOSITORY_MAP.keySet());
     }
 
     // Закрыть заказ
     @Override
     public void closeOrder(Integer orderId) {
         //PRODUCTION_REPOSITORY_MAP.remove(orderId);
-        DISTRIBUTION_REPOSITORY_MAP.remove(orderId);
+        //DISTRIBUTION_REPOSITORY_MAP.remove(orderId);
         ORDER_REPOSITORY_MAP.remove(orderId);
     }
 
