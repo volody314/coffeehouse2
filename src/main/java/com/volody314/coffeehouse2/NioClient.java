@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
@@ -28,12 +27,6 @@ public class NioClient {
 
     // Открывает канал
     public void startClient() throws IOException {
-//        channel = SocketChannel.open();
-//        channel.configureBlocking(false);
-//        selector = Selector.open();
-//        channel.register(selector, SelectionKey.OP_CONNECT);
-//        channel.connect(new InetSocketAddress(this.ADDRESS, this.PORT));
-
         System.out.println("Starting NIO client");
         InetSocketAddress hostAddress =
                 new InetSocketAddress(this.ADDRESS, this.PORT);
@@ -52,7 +45,6 @@ public class NioClient {
      * @param order Заказ
      */
     public void sendList(Order order) {
-        //byte [] bmessage = message.getBytes();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out;
         try {
@@ -65,8 +57,6 @@ public class NioClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.println("Sent");
         buffer.clear();
-        //return true;
     }
 }

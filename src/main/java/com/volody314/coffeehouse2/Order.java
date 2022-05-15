@@ -10,6 +10,12 @@ public class Order implements Serializable {
     private final Integer id; // Идентификатор заказа
     //private Float overralSum = 0.0;  // Сумма чека
     private Integer posCounter = 0; // Счётчик позиций
+
+    private boolean produced = false;   // Флаг готовности заказа к выдаче
+
+    private boolean removed = false;    // Флаг завершения заказа
+
+    private int timeStamp = -1;  // Метка начала производства
     private final ArrayList<OrderItem> orderItems = new ArrayList<>();  // Позиции заказа
 
 
@@ -67,4 +73,31 @@ public class Order implements Serializable {
         }
         posCounter = orderItems.size();
     }
+
+
+    public boolean isProduced() {
+        return produced;
+    }
+
+    public void setProduced() {
+        this.produced = true;
+    }
+
+    public int getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(int timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
 }
+

@@ -27,6 +27,7 @@ public class OrdersImpl implements Orders {
     BaristaServer baristaServer = new BaristaServer("localhost", 3001);
     // Сервер заказов
     OrdersServer ordersServer = new OrdersServer("localhost", 3000);
+    ReadyMonitor readyMonitor = new ReadyMonitor("localhost", 3002);
     // Клиент для обращения к серверу заказов
     NioClient ordersClient = new NioClient("localhost", 3000);
 
@@ -38,6 +39,7 @@ public class OrdersImpl implements Orders {
         // Старт потока баристы
         baristaServer.start();
         ordersServer.start();
+        readyMonitor.start();
 
         // Старт клиента заказов
         try {
@@ -47,6 +49,7 @@ public class OrdersImpl implements Orders {
             e.printStackTrace();
         }
         ordersServer.exchangeStart();
+        baristaServer.exchangeStart();
     }
 
     // Создание заказа
@@ -83,7 +86,7 @@ public class OrdersImpl implements Orders {
         Order order = ORDER_REPOSITORY_MAP.get(orderId);
         if (order != null) {
             ORDER_REPOSITORY_MAP.remove(orderId);
-            System.out.println("Sending to order "+orderId+" to server");
+            System.out.println("Web sends order "+orderId+" to order server");
             ordersClient.sendList(order);
             return true;
         } else return false;
