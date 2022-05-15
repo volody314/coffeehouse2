@@ -18,8 +18,6 @@ public class OrdersImpl implements Orders {
 
     // Хранилище заказов
     private static final Map<Integer, Order> ORDER_REPOSITORY_MAP = new HashMap<>();
-    //private static final Map<Integer, Order> PRODUCTION_REPOSITORY_MAP = new HashMap<>();
-    //private static final Map<Integer, Order> DISTRIBUTION_REPOSITORY_MAP = new HashMap<>();
 
     // "Внешние" объекты
 

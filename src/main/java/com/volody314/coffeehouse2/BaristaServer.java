@@ -42,6 +42,7 @@ public class BaristaServer extends NioServer {
                 // Обход заказов и имитация деятельности
                 // Удалить заказы помеченные под удаление
                 synchronized (ordersRepo) {
+                    //ordersRepo.removeIf();
                     Iterator<Map.Entry<Integer, Order>> entryIterator = ordersRepo.entrySet().iterator();
                     while (entryIterator.hasNext()) {
                         Map.Entry<Integer, Order> entry = entryIterator.next();
