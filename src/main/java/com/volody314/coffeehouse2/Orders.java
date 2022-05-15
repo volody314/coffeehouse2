@@ -44,7 +44,7 @@ public interface Orders {
      * Перечень заказов в производстве
      * @return Количество заказов в производстве
      */
-    List<Integer> showProduced();
+    List<Integer> showProducing();
 
     /**
      * Выводит перечень заказов на выдаче

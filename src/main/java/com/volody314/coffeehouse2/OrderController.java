@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class OrderController {
@@ -21,7 +19,6 @@ public class OrderController {
     // Создаёт заказ
     @GetMapping(value = "/orders")
     public ResponseEntity<Integer> create() {
-        //System.out.println(" *** Creating *** ");
         return new ResponseEntity<>(orders.create(), HttpStatus.CREATED);
     }
 
@@ -30,11 +27,8 @@ public class OrderController {
     public ResponseEntity<List<OrderItem>> read(@PathVariable(name = "id") Integer id) {
         //System.out.println(" *** Get-ting *** " + id);
         if (orders.orderExists(id)) {
-            //final List<Item> items = orders.read(id);
-            //return new ResponseEntity<>(items, HttpStatus.OK);
             return new ResponseEntity<>(orders.read(id), HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -76,16 +70,8 @@ public class OrderController {
     // Возвращает список заказов в производстве
     @GetMapping(value = "/product")
     public ResponseEntity<List<Integer>> showProd() {
-        return new ResponseEntity<>(orders.showProduced(), HttpStatus.OK);
+        return new ResponseEntity<>(orders.showProducing(), HttpStatus.OK);
     }
-
-    // Отправляет заказ на выдачу
-//    @PostMapping(value = "/product/{id}")
-//    public ResponseEntity<?> distributeOrder(@PathVariable(name = "id") Integer id) {
-//        if (orders.productExists(id)) {
-//            return new ResponseEntity<>(orders.distributeOrder(id), HttpStatus.OK);
-//        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
 
     // Возвращает список заказов на выдаче
     @GetMapping(value = "/distrib")
@@ -93,12 +79,4 @@ public class OrderController {
         return new ResponseEntity<>(orders.showDistribution(), HttpStatus.OK);
     }
 
-    // Закрывает заказ при выдаче
-//    @PostMapping(value = "/distrib/{ordId}")
-//    public ResponseEntity<?> closeOrder(@PathVariable(name = "ordId") Integer orderId) {
-//        if (orders.distribExists(orderId)) {
-//            orders.closeOrder(orderId);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
 }

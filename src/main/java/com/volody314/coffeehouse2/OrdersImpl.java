@@ -62,19 +62,22 @@ public class OrdersImpl implements Orders {
     // Чтение позиций заказа при заказе
     @Override
     public List<OrderItem> read(Integer orderId) {
-        return ORDER_REPOSITORY_MAP.get(orderId).getItems();
+        if (orderExists(orderId))
+            return ORDER_REPOSITORY_MAP.get(orderId).getItems();
+        else return null;
     }
 
     // Дабавление позиции в заказ
     @Override
     public Integer putItem(Integer orderId, OrderItem orderItem) {
-        return ORDER_REPOSITORY_MAP.get(orderId).addItem(orderItem);
+        if (orderExists(orderId))
+            return ORDER_REPOSITORY_MAP.get(orderId).addItem(orderItem);
+        else return -1;
     }
 
     // Удаление позиции из заказа
     @Override
     public List<OrderItem> deleteItem(Integer orderId, Integer itemId) {
-        //System.out.println("Deleting item "+itemId+" in order"+orderId);
         return ORDER_REPOSITORY_MAP.get(orderId).deleteItem(itemId);
     }
 
@@ -92,24 +95,29 @@ public class OrdersImpl implements Orders {
 
     // Перечень заказов в производстве у баристы
     @Override
-    public List<Integer> showProduced() {
-        //return PRODUCTION_REPOSITORY_MAP.size();
-        // ***************************************************
-        return new ArrayList<>(); //(PRODUCTION_REPOSITORY_MAP.keySet());
+    public List<Integer> showProducing() {
+        List<Integer> rez = new ArrayList<>();
+        for (Map.Entry<Integer, Order> order : readyMonitor.getMonitor().entrySet()) {
+            if (!(order.getValue().isProduced())) { rez.add(order.getKey()); }
+        }
+        //return new ArrayList<>(readyMonitor.getMonitor().keySet());
+        return rez;
     }
 
     // Перечень заказов на выдаче
     @Override
     public List<Integer> showDistribution() {
-        //return DISTRIBUTION_REPOSITORY_MAP.size();
-        return new ArrayList<>(); //(DISTRIBUTION_REPOSITORY_MAP.keySet());
+        List<Integer> rez = new ArrayList<>();
+        for (Map.Entry<Integer, Order> order : readyMonitor.getMonitor().entrySet()) {
+            if (order.getValue().isProduced()) { rez.add(order.getKey()); }
+        }
+        //return new ArrayList<>(readyMonitor.getMonitor().keySet());
+        return rez;
     }
 
     // Закрыть заказ
     @Override
     public void closeOrder(Integer orderId) {
-        //PRODUCTION_REPOSITORY_MAP.remove(orderId);
-        //DISTRIBUTION_REPOSITORY_MAP.remove(orderId);
         ORDER_REPOSITORY_MAP.remove(orderId);
     }
 
@@ -118,17 +126,4 @@ public class OrdersImpl implements Orders {
     public boolean orderExists(Integer orderId) {
         return ORDER_REPOSITORY_MAP.containsKey(orderId);
     }
-
-//    // Проверка наличия заказа в производстве - УДАЛИТЬ
-//    @Override
-//    public boolean productExists(Integer orderId) {
-//        // ************************************************
-//        return true; // PRODUCTION_REPOSITORY_MAP.containsKey(orderId);
-//    }
-//
-//    // Проверка наличия заказа на выдаче
-//    @Override
-//    public boolean distribExists(Integer orderId) {
-//        return DISTRIBUTION_REPOSITORY_MAP.containsKey(orderId);
-//    }
 }

@@ -33,21 +33,23 @@ public class ReadyMonitor extends NioServer {
             @Override
             public void run() {
                 // Удаляет из мониторинга заказы, помеченные для удаления
-                synchronized (ordersRepo) {
-                    //ordersRepo.removeIf();
-                    Iterator<Map.Entry<Integer, Order>> entryIterator = ordersRepo.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry<Integer, Order> entry = entryIterator.next();
-                        if (entry.getValue().isRemoved()) {
-                            entryIterator.remove();
+                while (!Thread.currentThread().isInterrupted()) {
+                    synchronized (ordersRepo) {
+                        //ordersRepo.removeIf();
+                        Iterator<Map.Entry<Integer, Order>> entryIterator = ordersRepo.entrySet().iterator();
+                        while (entryIterator.hasNext()) {
+                            Map.Entry<Integer, Order> entry = entryIterator.next();
+                            if (entry.getValue().isRemoved()) {
+                                entryIterator.remove();
+                            }
                         }
                     }
-                }
-                try {
-                    TimeUnit.SECONDS.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    try {
+                        TimeUnit.SECONDS.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         };
