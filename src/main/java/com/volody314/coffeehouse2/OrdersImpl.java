@@ -19,27 +19,28 @@ public class OrdersImpl implements Orders {
     // Хранилище заказов
     private static final Map<Integer, Order> ORDER_REPOSITORY_MAP = new HashMap<>();
 
+    // Генератор ID заказа
+    private static final AtomicInteger ORDER_ID_HOLDER = new AtomicInteger();
+
     // "Внешние" объекты
 
-    // Сервер производства (бариста)
-    BaristaServer baristaServer = new BaristaServer("localhost", 3001);
     // Сервер заказов
     OrdersServer ordersServer = new OrdersServer("localhost", 3000);
+    // Сервер производства (бариста)
+    BaristaServer baristaServer = new BaristaServer("localhost", 3001);
+    // Монитор состояния заказа
     ReadyMonitor readyMonitor = new ReadyMonitor("localhost", 3002);
     // Клиент для обращения к серверу заказов
     NioClient ordersClient = new NioClient("localhost", 3000);
 
-    // Генератор ID заказа
-    private static final AtomicInteger ORDER_ID_HOLDER = new AtomicInteger();
-
 
     public OrdersImpl() {
-        // Старт потока баристы
+        // Старт серверов этапов исполнения заказа
         baristaServer.start();
         ordersServer.start();
         readyMonitor.start();
 
-        // Старт клиента заказов
+        // Старт клиентов взаимодействия серверов
         try {
             TimeUnit.SECONDS.sleep(2);
             ordersClient.startClient();
